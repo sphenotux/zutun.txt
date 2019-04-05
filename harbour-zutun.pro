@@ -62,4 +62,7 @@ HEADERS +=
 quickaction.path = /usr/share/lipstick/quickactions
 quickaction.files = info.fuxl.zutuntxt.conf
 
-INSTALLS += quickaction
+shortcut.path = /usr/share/jolla-settings/entries
+shortcut.files = info.fuxl.zutuntxt.json
+
+INSTALLS += quickaction shortcut
