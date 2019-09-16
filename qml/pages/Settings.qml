@@ -48,6 +48,8 @@ Page {
             Component {
                 id: filePickerPage
                 //TODO how to create new file?
+                //sphenotux: BASH command would be: 'touch filename'
+                //? system("touch todo.txt")
                 FilePickerPage {
                     title: "todo.txt Location"
                     nameFilters: [ '*.txt']
