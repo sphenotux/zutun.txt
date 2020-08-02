@@ -2,134 +2,102 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 import "../tdt"
+import "../tdt/todotxt.js" as JS
 
 Page {
     id: page
-    property bool skip: false
-    property var visualModel1: visualModel
-    state: "projects"
 
-    SilicaListView {
-        id: lv
-        property string btnTxt: "Clear Project Filter"
-        property string title: "Projects"
-
+    SilicaFlickable {
         anchors.fill: parent
-
+        contentHeight: col.height
         PullDownMenu {
-            enabled: lv.count > 0
             MenuItem {
-                text: lv.btnTxt
-                onClicked: { filterModel.clearFilter(page.state); }
+                text: qsTr("Clear Filters")
+                onClicked: taskListModel.filters.clearFilters()
             }
         }
 
-        VerticalScrollDecorator {}
+        Column {
+            id: col
+            width: parent.width
 
-        header: PageHeader {
-            title: lv.title
-            //: PageHeader for currently set filters
-            description: qsTr("Active Filters: %1").arg(visualModel.filters.text())
-        }
 
-        ViewPlaceholder {
-            enabled: lv.count == 0
-            //: Placeholder if empty
-            text: qsTr("No entries")
-        }
+            VerticalScrollDecorator {}
 
-        model: filterModel
-
-        function numTasksHavingFilterItem(filterItem, countOnlyVisible) {
-            var num = 0
-            for (var i = 0; i < taskListModel.count; i++ ) {
-                if (taskListModel.get(i).fullTxt.indexOf(filterItem) > -1) {
-                    if (countOnlyVisible) {
-                        if (filters.visibility(taskListModel.get(i))) num++ //--> binding loop
-                    } else num++
-                }
+            PageHeader {
+                title: qsTr("Filters")
+                //: PageHeader for currently set filters
+                description: qsTr("Active Filters: %1").arg(taskListModel.filters.text) +
+                             " (%1/%2)".arg(taskListModel.visibleTextList.length).arg(taskListModel.count)
             }
-            return num
-        }
 
-        delegate: ListItem {
-            id: li
-            enabled: model.visibleCount > 0
-            highlighted: model.active
-            onClicked: filterModel.toggleFilter(model.name)
-            Label {
-                color: (li.enabled ? Theme.primaryColor : Theme.secondaryColor)
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.horizontalPageMargin
-                text: model.name + "(%1/%2)".arg(
-                          model.visibleCount).arg(
-                          model.totalCount)
+            SectionHeader {
+                text: qsTr("Projects")
             }
-        }
-    }
 
-    FilterModel {
-        id: filterModel
-        visualModel: visualModel1
-    }
-
-    Connections {
-        target: visualModel
-        onSortFinished: filterModel.parseLists()
-    }
-
-    onStatusChanged: {
-        if (status === PageStatus.Active) {
-            if (pageStack.depth === 1) {
-                if (settings.projectFilterLeft) {
-                    pageStack.pushAttached(Qt.resolvedUrl("TaskListPage.qml"), {})
-                    if (skip) {
-                        pageStack.navigateForward(PageStackAction.Immediate)
-                        skip = false
+            Component {
+                id: pcFilterDelegate
+                Row {
+                    id: row
+                    x: Theme.horizontalPageMargin
+                    height: Math.max(ts.height, bt.height)
+                    TextSwitch {
+                        id: ts
+                        width: page.width - 2*row.x - 2*bt.width
+                        anchors.verticalCenter: parent.verticalCenter
+                        _label.wrapMode: Text.NoWrap
+                        text: modelData + " (%1/%2)".arg(
+                                  taskListModel.visibleTextList.join("\n").split(modelData).length - 1).arg(
+                                  taskListModel.textList.join("\n").split(modelData).length - 1)
+                        automaticCheck: false
+                        checked: taskListModel.filters.inAnd(modelData)
+                        onClicked: taskListModel.filters.toggleFilterItem(modelData)
                     }
-                } else {
-                    pageStack.replace(Qt.resolvedUrl("TaskListPage.qml"), {}, PageStackAction.Immediate)
+                    TextSwitch {
+                        id: bt
+                        enabled: taskListModel.filters.inAnd(modelData)
+                        text: "!"
+                        width: height
+                        checked: taskListModel.filters.inNot(modelData)
+                        onClicked: taskListModel.filters.toggleNot(modelData)
+                    }
+                    TextSwitch {
+                        text: "|"
+                        enabled: taskListModel.filters.inAnd(modelData)
+                        width: height
+                        checked: taskListModel.filters.inOr(modelData)
+                        onClicked: taskListModel.filters.toggleOr(modelData)
+                    }
                 }
-            } else {
-                if (state == "contexts") pageStack.pushAttached("OtherFilters.qml")
-                if (state == "projects") pageStack.pushAttached("FiltersPage.qml", {state: "contexts"})
+            }
+
+            Repeater {
+                model: JS.projects.getList(taskListModel.textList)
+                delegate: pcFilterDelegate
+            }
+
+            SectionHeader {
+                text: qsTr("Contexts")
+            }
+
+            Repeater {
+                model: JS.contexts.getList(taskListModel.textList)
+                delegate: pcFilterDelegate
+
+            }
+
+
+            SectionHeader {
+                text: qsTr("Other Filters")
+            }
+
+            TextSwitch {
+                x: Theme.horizontalPageMargin
+                text: qsTr("Hide complete tasks")
+                automaticCheck: false
+                checked: filterSettings.hideDone
+                onClicked: filterSettings.hideDone = !filterSettings.hideDone
             }
         }
     }
-
-    states: [
-        State {
-            name: "projects"
-            PropertyChanges {
-                target: lv
-                //: Title for project + filters
-                title: qsTr("Filter projects")
-                //: Button for clearing project + filters
-                btnTxt: qsTr("Clear project filters")
-            }
-            PropertyChanges {
-                target: filterModel
-                list: taskListModel.projects
-                active: visualModel.filters.projects
-                onActiveChanged: filterSettings.projects.value = filterModel.active
-            }
-        }
-        , State {
-            name: "contexts"
-            PropertyChanges {
-                target: lv
-                //: Title for context @ filters
-                title: qsTr("Filter contexts")
-                //: Button for clearing context @ filters
-                btnTxt: qsTr("Clear context filters")
-            }
-            PropertyChanges {
-                target: filterModel
-                list: taskListModel.contexts
-                active: visualModel.filters.contexts
-                onActiveChanged: filterSettings.contexts.value = filterModel.active
-            }
-        }
-
-    ]
 }

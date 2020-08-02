@@ -1,30 +1,24 @@
 import QtQuick 2.6
 import QtQml.Models 2.2
 import Sailfish.Silica 1.0
+import QtQml 2.2
 
 import "../tdt/todotxt.js" as JS
+
+
 ListItem {
     id: listItem
 
     signal editItem()
-    onEditItem: ListView.view.editTask(model.index, model.fullTxt)
-    signal resortItem()
-
-    property string minPriority: "F"
-
-    function priorityUpDown(priority, up) {
-        //console.log("A"++)
-        if (up) {
-            if (priority === "") return String.fromCharCode(minPriority.charCodeAt(0));
-            else if (priority > "A") return String.fromCharCode(priority.charCodeAt(0) - 1);
-        } else  {
-            if (priority !== "") {
-                if (priority < "Z") return String.fromCharCode(priority.charCodeAt(0) + 1);
-                return ""
-            }
-        }
-        return priority
+    onEditItem: {
+        //ListView.view.editTaskc(model.index, model.fullTxt)
+        var editDialog = pageStack.push(Qt.resolvedUrl("../pages/TaskEditPage.qml"),
+                                        {taskIndex: model.index, text: model.fullTxt})
+        editDialog.accepted.connect(function() {
+            resortItem()
+        })
     }
+    signal resortItem()
 
     function remove() {
         remorseAction(qsTr("Deleting"), function() {
@@ -32,9 +26,11 @@ ListItem {
         }, 3000)
     }
 
-    width: ListView.view.width //app.width //ListView.view.width
-    contentHeight: Math.max(col.height, Theme.itemSizeExtraSmall)
+    width: ListView.view.width
+    contentHeight: (Math.max(col.height, Theme.itemSizeExtraSmall) + Theme.paddingSmall)// * visible
     onClicked: editItem()
+    //visible: taskListModel.filters.visibility(model)
+    //Component.onCompleted: console.debug(model)
 
     Column {
         id: col
@@ -46,12 +42,11 @@ ListItem {
             Switch {
                 id: doneSw
                 height: parent.height
-                automaticCheck: false
+                //automaticCheck: true
                 checked: model.done
                 onClicked: {
-                    //model.done = !checked //geht nicht in 5.6
-                    taskListModel.setTaskProperty(model.index, JS.baseFeatures.done, !checked)
-                    listItem.resortItem()
+                    taskListModel.setTaskProperty(model.index, JS.baseFeatures.done, checked)
+                    resortItem()
                 }
             }
             Label {
@@ -64,7 +59,7 @@ ListItem {
                 font.strikeout: model.done
                 font.pixelSize: settings.fontSizeTaskList
                 onLinkActivated: {
-                    console.log("link activated", link)
+                    console.debug("link activated", link)
                     Qt.openUrlExternally(link)
                 }
             }
@@ -85,7 +80,7 @@ ListItem {
             Label {
                 id: cdLbl
                 visible: model.creationDate !== ""
-                text: model.creationDate
+                text: JS.tools.isoToDate(model.creationDate, Locale.NarrowFormat)
                 font.pixelSize: parent.fontSize
             }
             Label {
@@ -97,7 +92,7 @@ ListItem {
             Label {
                 id: dueLbl
                 visible: model.due !== ""
-                text: model.due
+                text: JS.tools.isoToDate(model.due, Locale.NarrowFormat)
                 font.pixelSize: parent.fontSize
             }
             Label {
@@ -109,7 +104,7 @@ ListItem {
             Label {
                 //id: compLbl
                 visible: model.completionDate !== ""
-                text: model.completionDate
+                text: JS.tools.isoToDate(model.completionDate, Locale.NarrowFormat)
                 font.pixelSize: parent.fontSize
             }
         }
@@ -120,8 +115,8 @@ ListItem {
             visible: !(model.done || model.priority === "A")
             text: qsTr("Priority Up")
             onClicked: {
-                taskListModel.setTaskProperty(model.index, JS.baseFeatures.priority, priorityUpDown(model.priority, true))
-                //model.priority = priorityUpDown(model.priority, true)
+                var prio = taskListModel.alterPriority(model.priority, true)
+                taskListModel.setTaskProperty(model.index, JS.baseFeatures.priority, prio)
                 resortItem()
             }
         }
@@ -129,8 +124,9 @@ ListItem {
             visible: !(model.done || model.priority === "")
             text: qsTr("Priority Down")
             onClicked: {
-                taskListModel.setTaskProperty(model.index, JS.baseFeatures.priority, priorityUpDown(model.priority, false))
-                //model.priority = priorityUpDown(model.priority, true)
+                var prio = taskListModel.alterPriority(model.priority, false)
+                console.debug(prio)
+                taskListModel.setTaskProperty(model.index, JS.baseFeatures.priority, prio)
                 resortItem()
             }
         }

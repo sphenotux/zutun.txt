@@ -18,7 +18,6 @@ CoverBackground {
         anchors.fill: parent
         anchors.margins: Theme.paddingMedium
         clip: true
-        //TODO use package??
         model: visualModel.parts.cover
     }
 
@@ -31,11 +30,11 @@ CoverBackground {
         }
     }
 
-    onStatusChanged: {
-        if (status === Cover.Active ) {
-            //taskListModel.readFile();
-        }
-    }
+//    onStatusChanged: {
+//        if (status === Cover.active) {
+//            todoTxtFile.read("cover")
+//        }
+//    }
 }
 
 

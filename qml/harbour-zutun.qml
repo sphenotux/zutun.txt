@@ -11,8 +11,6 @@ import "tdt/todotxt.js" as JS
 
 //TODO archive to done.txt
 //TODO fehler über notifiactions ausgeben
-//TODO Search field??
-//TODO more verbose placeholder in tasklist
 
 ApplicationWindow {
     id: app
@@ -27,34 +25,45 @@ ApplicationWindow {
         id: settings
         path: "/apps/harbour-zutun/settings"
         property string todoTxtLocation: StandardPaths.documents + '/todo.txt'
+        property ConfigurationValue recentFiles: ConfigurationValue {
+            key: settings.path + "/recentFiles"
+            defaultValue: []
+        }
+        property ConfigurationValue pinnedRecentFiles: ConfigurationValue {
+            key: settings.path + "/pinnedRecentFiles"
+            defaultValue: []
+        }
         property string doneTxtLocation: StandardPaths.documents + '/done.txt'
-        //property alias autoSave: file.autoSave
         property int fontSizeTaskList: Theme.fontSizeMedium
         property bool projectFilterLeft: false
         property bool creationDateOnAddTask: false
+        property bool showSearch: false
+        property ConfigurationValue notificationIDs: ConfigurationValue {
+            key: settings.path + "/notificationIDs"
+            defaultValue: []
+        }
         ConfigurationGroup {
             id: filterSettings
             path: "/filters"
             property bool hideDone: true
-            //TODO filters are not stored (anymore?)
-            property ConfigurationValue projects: ConfigurationValue {
-                key: filterSettings.path + "/projects"
+            property ConfigurationValue and: ConfigurationValue {
+                key: filterSettings.path + "/and"
                 defaultValue: []
             }
-            property ConfigurationValue contexts: ConfigurationValue {
-                key: filterSettings.path + "/contexts"
+            property ConfigurationValue or: ConfigurationValue {
+                key: filterSettings.path + "/or"
                 defaultValue: []
             }
-
-            //store as strings??
-            property string projectsActive: ""
-            property string contextsActive: ""
+            property ConfigurationValue not: ConfigurationValue {
+                key: filterSettings.path + "/not"
+                defaultValue: []
+            }
         }
 
         ConfigurationGroup {
             id: sortSettings
             path: "sorting"
-            property bool asc: true
+            property bool asc: false
             property int order: 0
             property int grouping: 0
         }
@@ -73,6 +82,7 @@ ApplicationWindow {
 
         function showApp() {
             app.activate()
+            notificationList.publishNotifications()
         }
     }
 
@@ -84,55 +94,71 @@ ApplicationWindow {
         app.activate()
     }
 
+    property bool busy: todoTxtFile.busy //|| taskListModel.busy
+    property string placeholderText: {
+        if (todoTxtFile.error !== "") return qsTr("File reading error")
+        if (todoTxtFile.pathExists && !todoTxtFile.exists) return qsTr("File doesn't exist.\n Pull down to create it.")
+        if (todoTxtFile.content === "") return qsTr("File seems to be empty.\n Pull down to create one.")
+        if (taskListModel.textList.length === 0) return qsTr("No tasks found in file.\n Pull down to create one.")
+        if (taskListModel.visibleTextList.length === 0) return qsTr("All tasks are hidden by filters.\n Pull down to clear filters.")
+        return ""
+    }
+
     FileIO {
         id: todoTxtFile
-        property string hintText: ""
         path: settings.todoTxtLocation
-
-        onReadSuccess:
-            if (content) taskListModel.setTextList(content)
-
-        onIoError: {
-            //TODO needs some rework for translation
-            hintText = msg
+        onPathChanged: {
+            taskListModel.setFileContent("")
+            read("path changed")
         }
+
+        onReadSuccess:{
+            //console.debug(content)
+            taskListModel.setFileContent(content)
+        }
+
+        onPythonReadyChanged: if (pythonReady) read("python ready")
     }
 
     NotificationList {
         id: notificationList
+        ids: settings.notificationIDs.value
+        taskList: taskListModel
+    }
+
+    SortFilterModel {
+        id: visualModel
+        model: taskListModel
+        visibilityFunc: taskListModel.filters.visibility
+        lessThanFunc: taskListModel.sorting.lessThanFunc
+        delegate: Delegate {}
     }
 
     TaskListModel {
         id: taskListModel
-        projectColor: Theme.highlightColor
-        contextColor: Theme.secondaryHighlightColor
-        onSaveList: {
-            todoTxtFile.save(content)
-        }
 
-        onListChanged: {
-            visualModel.resort("listChanged")
-            notificationList.publishNotifications(this)
-        }
-    }
+        onSaveTodoTxtFile: todoTxtFile.save(content)
+        onTaskListDataChanged: notificationList.publishNotifications()
 
-    TaskDelegateModel {
-        id: visualModel
-        model: taskListModel
+        Component.onCompleted: {
+            JS.tools.projectColor = Theme.highlightColor
+            JS.tools.contextColor = Theme.secondaryHighlightColor
+        }
 
         filters {
             hideDone: filterSettings.hideDone
-            projects: filterSettings.projects.value
-            contexts: filterSettings.contexts.value
+            and: filterSettings.and.value
+            or: filterSettings.or.value
+            not: filterSettings.not.value
+            onFiltersChanged: visualModel.update()
         }
 
         sorting {
             asc: sortSettings.asc
             order: sortSettings.order
             groupBy: sortSettings.grouping
+            onSortingChanged: visualModel.update()
         }
-
-        delegate: Delegate { }
     }
 }
 

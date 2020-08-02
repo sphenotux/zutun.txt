@@ -1,37 +1,39 @@
 import QtQuick 2.0
 
+import "../tdt/todotxt.js" as JS
 
 Item {
     id: notificationList
     property var ids: []
-    //property var taskList
+    property var taskList: ListModel {}
 
-    function publishNotifications(taskList) {
-        console.log("notificationList")
+    function publishNotifications() {
         removeAll()
-        for (var i = 0; i < taskList.count; i++) {
-            var item = taskList.get(i)
-            if (item.due !== "" && item.done === false) {
+        for (var i = 0; i < taskList.count; i++){
+            var task = taskList.get(i)
+            if (task.due !== "" && task.done === false) {
                 var notificationComp = Qt.createComponent(Qt.resolvedUrl("./Notification.qml"))
 
-                var notification = notificationComp.createObject(null, {task: item}) //parent needed?
+                var notification = notificationComp.createObject(null , {task: task}) //parent needed?
                 notification.publish()
-                ids.push(notification.replacesId)
+                settings.notificationIDs.value.push(notification.replacesId)
                 //console.log(notification.replacesId, notifications.idList);
             }
         }
     }
 
     function removeAll() {
-        for (var i = 0; i < ids.length; i++) {
-            var notificationComp = Qt.createComponent(Qt.resolvedUrl("./Notification.qml"))
+        if (ids) {
+            ids.forEach(function(_id, index){
+                var notificationComp = Qt.createComponent(Qt.resolvedUrl("./Notification.qml"))
 
-            var notification = notificationComp.createObject(null, {task: taskListModel.lineToJSON("")})
-            notification.replacesId = ids[i]
-            notification.publish()
-            notification.close()
+                var notification = notificationComp.createObject(null, {task: JS.tools.lineToJSON("")})
+                notification.replacesId = _id
+                notification.publish()
+                notification.close()
+                settings.notificationIDs.value.splice(index, 1)
+            })
         }
-        ids = []
     }
 
 

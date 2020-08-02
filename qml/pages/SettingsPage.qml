@@ -1,7 +1,8 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Sailfish.Pickers 1.0
-//TODO Setting for automatically add creation date
+
+import "../components"
 
 Page {
     id: page
@@ -52,7 +53,7 @@ Page {
 
             Component {
                 id: filePickerPage
-                //TODO how to create new file?
+                //TODO start in current folder
                 FilePickerPage {
                     //: Page Header for the FilePickerPage (called from Button: Choose File)
                     title: "todo.txt Location"
@@ -65,11 +66,47 @@ Page {
             }
 
             SectionHeader {
+                //: Section Header for the Files section in Settings page
+                text: qsTr("Recent files")
+                color: palette.secondaryColor
+            }
+            Column {
+                width: page.width
+                RecentFiles {
+                    id: pinnedRF
+                    files: settings.pinnedRecentFiles.value
+                    pinned: true
+                    onSetFiles: {
+                        settings.pinnedRecentFiles.value = files
+                    }
+                    onTogglePinned:  {
+                        var item = this.remove(index)
+                        recentFiles.add(item)
+                    }
+                    onFileClicked: todoTxtPath.text = path
+                }
+                RecentFiles {
+                    id: recentFiles
+                    pinned: false
+                    files: settings.recentFiles.value
+                    onSetFiles:{
+                        settings.recentFiles.value = files
+                    }
+                    onTogglePinned:  {
+                        var item = this.remove(index)
+                        pinnedRF.add(item)
+                    }
+                    onFileClicked: todoTxtPath.text = path
+                }
+            }
+
+            SectionHeader {
                 //: Section Header for the Tasklist section in Settings page
-                text: "Tasklist"
+                text: qsTr("Tasklist")
             }
             Row {
                 width: parent.width
+                //TODO convert to pulldown
                 Slider {
                     id: fontSizeSlider
                     //x: Theme.horizontalPageMargin
@@ -89,25 +126,26 @@ Page {
                     onClicked: fontSizeSlider.value = Theme.fontSizeMedium
                 }
             }
-            SectionHeader {
-                //: Section Header for the Filter section in Settings page
-                text: "Filter"
-            }
-            TextSwitch {
-                //: TextSwitch for project filter
-                text: qsTr("Attach project filter to the left of tasklist.")
-                //description: "Restart the app to take effect."
-                checked: settings.projectFilterLeft
-                onClicked: settings.projectFilterLeft = checked
-            }
+//            SectionHeader {
+//                //: Section Header for the Filter section in Settings page
+//                text: qsTr("Filter")
+//            }
+//            TextSwitch {
+//                //: TextSwitch for project filter
+//                text: qsTr("Attach project filter to the left of tasklist.")
+//                //description: "Restart the app to take effect."
+//                checked: settings.projectFilterLeft
+//                onClicked: settings.projectFilterLeft = checked
+//            }
             SectionHeader {
                 //: Section Header for the Edit section in Settings page
-                text: "Edit Task"
+                text: qsTr("Edit Task")
             }
             TextSwitch {
                 //: TextSwitch for adding creation date
                 text: qsTr("Auto add creation date.")
-                description: "Automatically add creation date to newly added tasks."
+                //: TextSwitch for adding creation date
+                description: qsTr("Automatically add creation date to newly added tasks.")
                 checked: settings.creationDateOnAddTask
                 onClicked: settings.creationDateOnAddTask = checked
             }
@@ -115,6 +153,8 @@ Page {
         Component.onDestruction: {
             // write back settings and save
             settings.todoTxtLocation = todoTxtPath.text
+            if (settings.pinnedRecentFiles.value.indexOf(todoTxtPath.text) === -1)
+                recentFiles.add(todoTxtPath.text)
             settings.fontSizeTaskList = fontSizeSlider.sliderValue;
             settings.sync();
         }

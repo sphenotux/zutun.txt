@@ -4,20 +4,22 @@ import Sailfish.Silica 1.0
 import "../components"
 import "../tdt"
 
+import "../tdt/todotxt.js" as JS
+
 Page {
     id: page
 
     SilicaListView {
         id: lv
         anchors.fill: parent
-        spacing: Theme.paddingSmall
-
+        //spacing: Theme.paddingSmall
         VerticalScrollDecorator {}
+        currentIndex: -1 // otherwise currentItem will steal focus
         PullDownMenu {
             MenuItem {
                 //: PullDown menu: go to settings page
                 text: qsTr("Settings")
-                onClicked: pageStack.push(Qt.resolvedUrl("Settings.qml"))
+                onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
             MenuItem {
                 //: PullDown menu: go to sorting & grouping page
@@ -36,6 +38,12 @@ Page {
                 text: qsTr("Create file")
                 onClicked: todoTxtFile.create()
             }
+            MenuItem {
+                visible: taskListModel.count > 0 && taskListModel.visibleTextList.length === 0
+                //: PullDown menu: clear filters
+                text: qsTr("Clear filters")
+                onClicked: taskListModel.filters.clearFilters()
+            }
         }
 
 
@@ -49,12 +57,12 @@ Page {
 
         header: Item {
             width: page.width
-            height: pgh.height + flbl.height
+            height: pgh.height + flbl.height + searchField.height
             PageHeader {
                 id: pgh
                 //: PageHeader for tasklist main page
                 title: qsTr("Tasklist")
-                description: visualModel.sorting.groupText + visualModel.sorting.sortText
+                description: taskListModel.sorting.groupText + taskListModel.sorting.sortText
             }
             Label { /*from PageHeaderDescription.qml */
                 id: flbl
@@ -62,7 +70,7 @@ Page {
                 anchors {
                     top: pgh.bottom
                     topMargin: -Theme.paddingMedium
-                    right: pgh.right
+                    right: parent.right
                     rightMargin: pgh.rightMargin
                 }
                 font.pixelSize: Theme.fontSizeSmall
@@ -71,8 +79,45 @@ Page {
                 horizontalAlignment: Text.AlignRight
                 truncationMode: TruncationMode.Fade
                 //: Information about filter settings at the top of main page
-                text: qsTr("Filter: %1").arg(visualModel.filters.text()) + " (%1/%2)".arg(visualModel.itemsCount).arg(taskListModel.count)
+                text: qsTr("Filter: %1").arg(taskListModel.filters.text) +
+                      " (%1/%2)".arg(taskListModel.visibleTextList.length).arg(taskListModel.count)
             }
+            SearchField {
+                id: searchField
+                anchors {
+                    top: flbl.bottom
+                    left: parent.left
+                    right: parent.right
+                }
+                canHide: true
+                active: settings.showSearch
+                onHideClicked: settings.showSearch = ! searchField.active
+                Binding {
+                    target: taskListModel.filters
+                    property: "searchString"
+                    value: searchField.text.trim()
+                }
+                onActiveFocusChanged: {
+                    if (!active) _editor.focus = false
+                }
+            }
+
+            IconButton {
+                anchors {
+                    bottom: flbl.bottom
+                    left: parent.left
+                    leftMargin: searchField.textLeftMargin - width - Theme.paddingSmall
+                }
+                //x: searchField.textLeftMargin - width - Theme.paddingSmall
+                icon.source: "image://theme/icon-m-search"
+                opacity: 1*!searchField.active
+                onClicked: {
+                    settings.showSearch = !searchField.active
+                    searchField._editor.focus = true
+                    searchField._editor.forceActiveFocus()
+                }
+                NumberAnimation on opacity { easing.type: Easing.InOutQuad; duration: searchField.transitionDuration }
+             }
         }
 
         footer: Item {
@@ -81,7 +126,7 @@ Page {
         }
 
         section {
-            property: visualModel.sorting.sectionProperty//"section"
+            property: taskListModel.sorting.sectionProperty//"section"
             criteria: ViewSection.FullString
             delegate: SectionHeader {
                 text: section //"Section: %1".arg(section)
@@ -89,18 +134,17 @@ Page {
         }
 
         ViewPlaceholder {
-            enabled: lv.count === 0
-            //: Placeholder if todo.txt file does not contain any unfinished tasks
+            enabled: taskListModel.visibleTextList.length === 0
+            //: Placeholder when no visible tasks for various reasons (file error, empty file, filters)
             text: qsTr("No tasks")
-            hintText: (todoTxtFile.hintText === ""? qsTr("Pull down to add task.")
-                                                : todoTxtFile.hintText)
+            hintText: app.placeholderText
         }
 
         BusyIndicator {
             size: BusyIndicatorSize.Large
             anchors.centerIn: parent
-            //enabled: lv.count === 0
-            running: visualModel.unsortedItems.count > 0
+            enabled: false
+            running: app.busy
         }
 
         function editTask(index, taskTxt) {
@@ -112,24 +156,25 @@ Page {
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
-            todoTxtFile.read()
+            todoTxtFile.read("tasklist active")
             /* attach filter page: */
-            if ( pageStack.depth === 1) {
-                if (settings.projectFilterLeft) {
-                    //                    console.log("replacing tl")
-                    pageStack.replace(Qt.resolvedUrl("FiltersPage.qml"),
-                                      {state: "projects", skip: true}, PageStackAction.Immediate);
-                } else {
-                    pageStack.pushAttached(Qt.resolvedUrl("FiltersPage.qml"), {state: "projects"})
-                }
-            } else {
-                if (!settings.projectFilterLeft){
-                    pageStack.replaceAbove(null, Qt.resolvedUrl("TaskListPage.qml"),
-                                           {}, PageStackAction.Immediate);
-                } else {
-                    pageStack.pushAttached(Qt.resolvedUrl("FiltersPage.qml"), {state: "contexts"})
-                }
-            }
+            pageStack.pushAttached(Qt.resolvedUrl("FiltersPage.qml"))
+//            if ( pageStack.depth === 1) {
+//                if (settings.projectFilterLeft) {
+//                    //                    console.log("replacing tl")
+//                    pageStack.replace(Qt.resolvedUrl("FiltersPage.qml"),
+//                                      {state: "projects", skip: true}, PageStackAction.Immediate);
+//                } else {
+//                    pageStack.pushAttached(Qt.resolvedUrl("FiltersPage_copy.qml"))
+//                }
+//            } else {
+//                if (!settings.projectFilterLeft){
+//                    pageStack.replaceAbove(null, Qt.resolvedUrl("TaskListPage.qml"),
+//                                           {}, PageStackAction.Immediate);
+//                } else {
+//                    pageStack.pushAttached(Qt.resolvedUrl("FiltersPage.qml"), {state: "contexts"})
+//                }
+//            }
         }
     }
 }

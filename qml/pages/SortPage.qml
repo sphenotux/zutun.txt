@@ -1,8 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-//TODO grouping
-
 Page {
     id:page
 
@@ -39,7 +37,8 @@ Page {
                 width: Theme.buttonWidthLarge
                 anchors.horizontalCenter: parent.horizontalCenter
                 //: Button to toggle order
-                text: qsTr("Toggle order (") + (sortSettings.asc ? "asc" : "desc") + ")"
+                text: qsTr("Toggle order (%1)").arg(
+                          sortSettings.asc ? qsTr("asc") : qsTr("desc"))
                 onClicked: sortSettings.asc = !sortSettings.asc
             }
 
@@ -50,7 +49,7 @@ Page {
 
             Repeater {
                 id: rep
-                property var list: visualModel.sorting.functionList
+                property var list: taskListModel.sorting.functionList
                 model: list.length
 
                 delegate: TextSwitch {
@@ -70,7 +69,7 @@ Page {
 
             Repeater {
                 id: groupRep
-                property var list: visualModel.sorting.groupFunctionList
+                property var list: taskListModel.sorting.groupFunctionList
                 model: list.length
 
                 delegate: TextSwitch {
@@ -84,5 +83,4 @@ Page {
             }
         }
     }
-
 }

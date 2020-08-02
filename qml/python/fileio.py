@@ -3,6 +3,7 @@
 
 import os
 import pyotherside
+import locale
 
 
 
@@ -16,6 +17,7 @@ def checkPath(path, perm):
     return True
 
 def checkFile(path, perm):
+    #pyotherside.send('log',locale.getlocale())
     if checkPath(path, perm):
         pyotherside.send('pathExists', True)
     else:
@@ -52,10 +54,10 @@ def read(path):
         with open(path, 'rt') as f:
             read_data = f.read()
             #f.close()
-            #pyotherside.send('log', "Content read {0}".format(path))
-            return read_data
+            pyotherside.send('log', "Content read {0}".format(path))
+            return read_data, os.path.getmtime(path)
     else:
-        return ""
+        return False
 
 
 def write(path, content):
@@ -65,7 +67,7 @@ def write(path, content):
             f.write(content)
             f.close()
             pyotherside.send('log', "Content saved to {0}".format(path))
-
+            return os.path.getmtime(path)
 
 def create(path):
     try:

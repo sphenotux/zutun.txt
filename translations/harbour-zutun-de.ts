@@ -45,44 +45,45 @@
     <name>Filters</name>
     <message>
         <source>Hide complete</source>
-        <translation>Verberge fertige</translation>
+        <extracomment>text about active filters</extracomment>
+        <translation>Verberge erledigte</translation>
     </message>
     <message>
         <source>None</source>
+        <extracomment>text about active filters</extracomment>
         <translation>Keine</translation>
     </message>
 </context>
 <context>
     <name>FiltersPage</name>
     <message>
-        <source>No entries</source>
-        <extracomment>Placeholder if empty</extracomment>
-        <translation>Keine Einträge</translation>
-    </message>
-    <message>
         <source>Active Filters: %1</source>
         <extracomment>PageHeader for currently set filters</extracomment>
         <translation>Aktive Filter: %1</translation>
     </message>
     <message>
-        <source>Filter projects</source>
-        <extracomment>Title for project + filters</extracomment>
-        <translation>Projektfilter</translation>
+        <source>Clear Filters</source>
+        <translation>Filter entfernen</translation>
     </message>
     <message>
-        <source>Clear project filters</source>
-        <extracomment>Button for clearing project + filters</extracomment>
-        <translation>Projektfilter löschen</translation>
+        <source>Filters</source>
+        <translation>Filter</translation>
     </message>
     <message>
-        <source>Filter contexts</source>
-        <extracomment>Title for context @ filters</extracomment>
-        <translation>Kontextfilter</translation>
+        <source>Projects</source>
+        <translation>Projekte</translation>
     </message>
     <message>
-        <source>Clear context filters</source>
-        <extracomment>Button for clearing context @ filters</extracomment>
-        <translation>Kontextfilter löschen</translation>
+        <source>Contexts</source>
+        <translation>Kontexte</translation>
+    </message>
+    <message>
+        <source>Other Filters</source>
+        <translation>Andere Filter</translation>
+    </message>
+    <message>
+        <source>Hide complete tasks</source>
+        <translation>Verberge erledigte Aufgaben</translation>
     </message>
 </context>
 <context>
@@ -114,7 +115,26 @@
     </message>
 </context>
 <context>
-    <name>Settings</name>
+    <name>RecentFiles</name>
+    <message>
+        <source>Deleting</source>
+        <translation>Lösche</translation>
+    </message>
+    <message>
+        <source>unpin</source>
+        <translation>Loslösen</translation>
+    </message>
+    <message>
+        <source>pin</source>
+        <translation>Anheften</translation>
+    </message>
+    <message>
+        <source>remove</source>
+        <translation>Löschen</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
     <message>
         <source>About</source>
         <extracomment>Information on the app: version, author, source code etc.</extracomment>
@@ -126,19 +146,14 @@
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <source>Path to todo.txt</source>
-        <extracomment>Where - in which folder - is the todo.txt file located?</extracomment>
-        <translation>Pfad zu todo.txt</translation>
-    </message>
-    <message>
         <source>Files</source>
         <extracomment>Section Header for the Files section in Settings page</extracomment>
         <translation>Dateien</translation>
     </message>
     <message>
-        <source>Attach project filter to the left of tasklist.</source>
-        <extracomment>TextSwitch for project filter</extracomment>
-        <translation>Projektfilter links der Aufgabenliste plazieren.</translation>
+        <source>Path to todo.txt</source>
+        <extracomment>Where - in which folder - is the todo.txt file located?</extracomment>
+        <translation>Pfad zu todo.txt</translation>
     </message>
     <message>
         <source>Choose file</source>
@@ -148,12 +163,17 @@
     <message>
         <source>Fontsize in Tasklist</source>
         <extracomment>Slide control for font size</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Zeichengröße in Aufgabenliste</translation>
     </message>
     <message>
         <source>Auto add creation date.</source>
         <extracomment>TextSwitch for adding creation date</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Füge automatisch Erstelldatum hinzu.</translation>
+    </message>
+    <message>
+        <source>Recent files</source>
+        <extracomment>Section Header for the Files section in Settings page</extracomment>
+        <translation>Aktuelle Dateien</translation>
     </message>
 </context>
 <context>
@@ -179,9 +199,17 @@
         <translation>Sortieren &amp; Gruppieren</translation>
     </message>
     <message>
-        <source>Toggle order (</source>
+        <source>Toggle order (%1)</source>
         <extracomment>Button to toggle order</extracomment>
-        <translation>Reihenfolge umschalten </translation>
+        <translation>Schalte Reihenfolge um (%1)</translation>
+    </message>
+    <message>
+        <source>asc</source>
+        <translation>auf</translation>
+    </message>
+    <message>
+        <source>desc</source>
+        <translation>ab</translation>
     </message>
 </context>
 <context>
@@ -192,11 +220,11 @@
     </message>
     <message>
         <source>asc</source>
-        <translation>aufsteigend</translation>
+        <translation>auf</translation>
     </message>
     <message>
         <source>desc</source>
-        <translation>absteigend</translation>
+        <translation>ab</translation>
     </message>
     <message>
         <source>Grouped by %1, </source>
@@ -219,12 +247,12 @@
     </message>
     <message>
         <source>Projects</source>
-        <extracomment>SortPage, group by: Projects</extracomment>
+        <extracomment>SortPage, group by: projects</extracomment>
         <translation>Projekte</translation>
     </message>
     <message>
         <source>Contexts</source>
-        <extracomment>SortPage, group by: Contexts</extracomment>
+        <extracomment>SortPage, group by: contexts</extracomment>
         <translation>Kontexte</translation>
     </message>
     <message>
@@ -278,7 +306,7 @@
     </message>
     <message>
         <source>completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>erledigt:</translation>
     </message>
 </context>
 <context>
@@ -308,10 +336,6 @@
         <translation>Aufgabenliste</translation>
     </message>
     <message>
-        <source>Pull down to add task.</source>
-        <translation>Nach unten ziehen, um eine Aufgabe hinzuzufügen.</translation>
-    </message>
-    <message>
         <source>Filter: %1</source>
         <extracomment>Information about filter settings at the top of main page</extracomment>
         <translation>Filter: %1</translation>
@@ -332,8 +356,13 @@
     </message>
     <message>
         <source>No tasks</source>
-        <extracomment>Placeholder if todo.txt file does not contain any unfinished tasks</extracomment>
+        <extracomment>Placeholder when no visible tasks for various reasons (file error, empty file, filters)</extracomment>
         <translation>Keine Aufgaben</translation>
+    </message>
+    <message>
+        <source>Clear filters</source>
+        <extracomment>PullDown menu: clear filters</extracomment>
+        <translation>Filter entfernen</translation>
     </message>
 </context>
 <context>
@@ -354,6 +383,33 @@
     <message>
         <source>Contexts</source>
         <translation>Kontexte</translation>
+    </message>
+</context>
+<context>
+    <name>harbour-zutun</name>
+    <message>
+        <source>File reading error</source>
+        <translation>Dateilesefehler</translation>
+    </message>
+    <message>
+        <source>File doesn&apos;t exist.
+ Pull down to create it.</source>
+        <translation>Datei existiert nicht.\nRunterziehen, um Datei zu erzeugen.</translation>
+    </message>
+    <message>
+        <source>File seems to be empty.
+ Pull down to create one.</source>
+        <translation>Datei scheint leer zu sein.\nRunterziehen, um sie zu erstellen.</translation>
+    </message>
+    <message>
+        <source>No tasks found in file.
+ Pull down to create one.</source>
+        <translation>Keine Aufgaben in Datei gefunden.\nRunterziehn, um eine zu erstellen.</translation>
+    </message>
+    <message>
+        <source>All tasks are hidden by filters.
+ Pull down to clear filters.</source>
+        <translation>Alle Aufgaben sind gefiltert.\nRunterziehen, um Filter zu entfernen.</translation>
     </message>
 </context>
 </TS>

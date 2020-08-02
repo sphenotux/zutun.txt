@@ -45,43 +45,44 @@
     <name>Filters</name>
     <message>
         <source>Hide complete</source>
+        <extracomment>text about active filters</extracomment>
         <translation type="unfinished">Hide complete</translation>
     </message>
     <message>
         <source>None</source>
+        <extracomment>text about active filters</extracomment>
         <translation type="unfinished">None</translation>
     </message>
 </context>
 <context>
     <name>FiltersPage</name>
     <message>
-        <source>No entries</source>
-        <extracomment>Placeholder if empty</extracomment>
-        <translation type="unfinished">No entries</translation>
-    </message>
-    <message>
         <source>Active Filters: %1</source>
         <extracomment>PageHeader for currently set filters</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Filter projects</source>
-        <extracomment>Title for project + filters</extracomment>
+        <source>Clear Filters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clear project filters</source>
-        <extracomment>Button for clearing project + filters</extracomment>
+        <source>Filters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Filter contexts</source>
-        <extracomment>Title for context @ filters</extracomment>
+        <source>Projects</source>
+        <translation type="unfinished">Projects</translation>
+    </message>
+    <message>
+        <source>Contexts</source>
+        <translation type="unfinished">Contexts</translation>
+    </message>
+    <message>
+        <source>Other Filters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clear context filters</source>
-        <extracomment>Button for clearing context @ filters</extracomment>
+        <source>Hide complete tasks</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -114,36 +115,50 @@
     </message>
 </context>
 <context>
-    <name>Settings</name>
+    <name>RecentFiles</name>
+    <message>
+        <source>Deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unpin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
     <message>
         <source>About</source>
         <extracomment>Information on the app: version, author, source code etc.</extracomment>
-        <translation>About</translation>
+        <translation type="unfinished">About</translation>
     </message>
     <message>
         <source>Settings</source>
         <extracomment>Page Header for the Settings page</extracomment>
-        <translation>Settings</translation>
-    </message>
-    <message>
-        <source>Path to todo.txt</source>
-        <extracomment>Where - in which folder - is the todo.txt file located?</extracomment>
-        <translation>Path to todo.txt</translation>
-    </message>
-    <message>
-        <source>Choose file</source>
-        <extracomment>Button for picking the file</extracomment>
-        <translation>Choose file</translation>
+        <translation type="unfinished">Settings</translation>
     </message>
     <message>
         <source>Files</source>
         <extracomment>Section Header for the Files section in Settings page</extracomment>
-        <translation>Files</translation>
+        <translation type="unfinished">Files</translation>
     </message>
     <message>
-        <source>Attach project filter to the left of tasklist.</source>
-        <extracomment>TextSwitch for project filter</extracomment>
-        <translation>Attach project filter to the left of tasklist.</translation>
+        <source>Path to todo.txt</source>
+        <extracomment>Where - in which folder - is the todo.txt file located?</extracomment>
+        <translation type="unfinished">Path to todo.txt</translation>
+    </message>
+    <message>
+        <source>Choose file</source>
+        <extracomment>Button for picking the file</extracomment>
+        <translation type="unfinished">Choose file</translation>
     </message>
     <message>
         <source>Fontsize in Tasklist</source>
@@ -155,14 +170,14 @@
         <extracomment>TextSwitch for adding creation date</extracomment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recent files</source>
+        <extracomment>Section Header for the Files section in Settings page</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SortPage</name>
-    <message>
-        <source>Toggle order (</source>
-        <extracomment>Button to toggle order</extracomment>
-        <translation>Toggle order (</translation>
-    </message>
     <message>
         <source>Reset</source>
         <extracomment>PullDown menu: reset SortPage</extracomment>
@@ -182,6 +197,19 @@
         <source>Sorting &amp; Grouping</source>
         <extracomment>Title of SortPage</extracomment>
         <translation>Sorting &amp; Grouping</translation>
+    </message>
+    <message>
+        <source>Toggle order (%1)</source>
+        <extracomment>Button to toggle order</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>asc</source>
+        <translation type="unfinished">asc</translation>
+    </message>
+    <message>
+        <source>desc</source>
+        <translation type="unfinished">desc</translation>
     </message>
 </context>
 <context>
@@ -229,12 +257,12 @@
     </message>
     <message>
         <source>Projects</source>
-        <extracomment>SortPage, group by: Projects</extracomment>
+        <extracomment>SortPage, group by: projects</extracomment>
         <translation type="unfinished">Projects</translation>
     </message>
     <message>
         <source>Contexts</source>
-        <extracomment>SortPage, group by: Contexts</extracomment>
+        <extracomment>SortPage, group by: contexts</extracomment>
         <translation type="unfinished">Contexts</translation>
     </message>
 </context>
@@ -328,12 +356,13 @@
     </message>
     <message>
         <source>No tasks</source>
-        <extracomment>Placeholder if todo.txt file does not contain any unfinished tasks</extracomment>
+        <extracomment>Placeholder when no visible tasks for various reasons (file error, empty file, filters)</extracomment>
         <translation type="unfinished">No tasks</translation>
     </message>
     <message>
-        <source>Pull down to add task.</source>
-        <translation type="unfinished">Pull down to add task.</translation>
+        <source>Clear filters</source>
+        <extracomment>PullDown menu: clear filters</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -354,6 +383,33 @@
     <message>
         <source>Contexts</source>
         <translation>Contexts</translation>
+    </message>
+</context>
+<context>
+    <name>harbour-zutun</name>
+    <message>
+        <source>File reading error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File doesn&apos;t exist.
+ Pull down to create it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File seems to be empty.
+ Pull down to create one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No tasks found in file.
+ Pull down to create one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All tasks are hidden by filters.
+ Pull down to clear filters.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
